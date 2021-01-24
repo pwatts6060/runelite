@@ -25,20 +25,22 @@
 
 package net.runelite.client.plugins.crowdsourcing;
 
-import java.time.temporal.ChronoUnit;
-import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.crowdsourcing.cooking.CrowdsourcingCooking;
 import net.runelite.client.plugins.crowdsourcing.dialogue.CrowdsourcingDialogue;
+import net.runelite.client.plugins.crowdsourcing.mining.CrowdsourcingMining;
 import net.runelite.client.plugins.crowdsourcing.movement.CrowdsourcingMovement;
 import net.runelite.client.plugins.crowdsourcing.music.CrowdsourcingMusic;
 import net.runelite.client.plugins.crowdsourcing.thieving.CrowdsourcingThieving;
 import net.runelite.client.plugins.crowdsourcing.woodcutting.CrowdsourcingWoodcutting;
 import net.runelite.client.plugins.crowdsourcing.zmi.CrowdsourcingZMI;
 import net.runelite.client.task.Schedule;
+
+import javax.inject.Inject;
+import java.time.temporal.ChronoUnit;
 
 @Slf4j
 @PluginDescriptor(
@@ -75,6 +77,9 @@ public class CrowdsourcingPlugin extends Plugin
 	private CrowdsourcingWoodcutting woodcutting;
 
 	@Inject
+	private CrowdsourcingMining mining;
+
+	@Inject
 	private CrowdsourcingZMI zmi;
 
 	@Override
@@ -86,6 +91,7 @@ public class CrowdsourcingPlugin extends Plugin
 		eventBus.register(music);
 		eventBus.register(thieving);
 		eventBus.register(woodcutting);
+		eventBus.register(mining);
 		eventBus.register(zmi);
 	}
 
@@ -98,6 +104,7 @@ public class CrowdsourcingPlugin extends Plugin
 		eventBus.unregister(music);
 		eventBus.unregister(thieving);
 		eventBus.unregister(woodcutting);
+		eventBus.unregister(mining);
 		eventBus.unregister(zmi);
 	}
 

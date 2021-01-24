@@ -26,30 +26,28 @@
 package net.runelite.client.plugins.crowdsourcing.mining;
 
 import com.google.common.collect.ImmutableMap;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import javax.inject.Inject;
-
 import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
-import net.runelite.api.events.ChatMessage;
-import net.runelite.api.events.GameObjectDespawned;
-import net.runelite.api.events.GameTick;
-import net.runelite.api.events.MenuOptionClicked;
+import net.runelite.api.events.*;
+import net.runelite.api.widgets.Widget;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.crowdsourcing.CrowdsourcingManager;
 import net.runelite.client.plugins.crowdsourcing.skilling.SkillingEndReason;
 import net.runelite.client.plugins.crowdsourcing.skilling.SkillingState;
+
+import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import static net.runelite.client.plugins.crowdsourcing.mining.RockType.*;
 
 public class CrowdsourcingMining
 {
     private static final String SWING_MESSAGE = "You swing your pick at the rock.";
-    private static final String INVENTORY_FULL_MESSAGE = "Your inventory is too full to hold any more logs."; //?
-    private static final String GEM_MESSAGE = "You just mined";
+    private static final String INVENTORY_FULL_MESSAGE = "Your inventory is too full to hold";
+    private static final String GEM_MESSAGE = "You just found";
     private static final Map<Integer, RockType> ORE_OBJECTS = new ImmutableMap.Builder<Integer, RockType>().
             put(ObjectID.ROCKS_11378, BLURITE).
             put(ObjectID.ROCKS_11379, BLURITE).
@@ -82,33 +80,6 @@ public class CrowdsourcingMining
             put(ObjectID.ROCKS_11376, RUNITE).
             build();
 
-    private static final Map<Integer, Integer> PICKAXE_ANIMS = new ImmutableMap.Builder<Integer, Integer>().
-            put(AnimationID.MINING_BRONZE_PICKAXE, ItemID.BRONZE_PICKAXE).
-            put(AnimationID.MINING_MOTHERLODE_BRONZE, ItemID.BRONZE_PICKAXE).
-            put(AnimationID.MINING_MOTHERLODE_IRON, ItemID.IRON_PICKAXE).
-            put(AnimationID.MINING_IRON_PICKAXE, ItemID.IRON_PICKAXE).
-            put(AnimationID.MINING_STEEL_PICKAXE, ItemID.STEEL_PICKAXE).
-            put(AnimationID.MINING_MOTHERLODE_STEEL, ItemID.STEEL_PICKAXE).
-            put(AnimationID.MINING_BLACK_PICKAXE, ItemID.BLACK_PICKAXE).
-            put(AnimationID.MINING_MOTHERLODE_BLACK, ItemID.BLACK_PICKAXE).
-            put(AnimationID.MINING_MITHRIL_PICKAXE, ItemID.MITHRIL_PICKAXE).
-            put(AnimationID.MINING_MOTHERLODE_MITHRIL, ItemID.MITHRIL_PICKAXE).
-            put(AnimationID.MINING_ADAMANT_PICKAXE, ItemID.ADAMANT_PICKAXE).
-            put(AnimationID.MINING_MOTHERLODE_ADAMANT, ItemID.ADAMANT_PICKAXE).
-            put(AnimationID.MINING_RUNE_PICKAXE, ItemID.RUNE_PICKAXE).
-            put(AnimationID.MINING_MOTHERLODE_RUNE, ItemID.RUNE_PICKAXE).
-            put(AnimationID.MINING_DRAGON_PICKAXE, ItemID.DRAGON_PICKAXE).
-            put(AnimationID.MINING_MOTHERLODE_DRAGON, ItemID.DRAGON_PICKAXE).
-            put(AnimationID.MINING_DRAGON_PICKAXE_OR, ItemID.DRAGON_PICKAXE_OR).
-            put(AnimationID.MINING_MOTHERLODE_DRAGON_OR, ItemID.DRAGON_PICKAXE_OR).
-            put(AnimationID.MINING_DRAGON_PICKAXE_OR_TRAILBLAZER, ItemID.DRAGON_PICKAXE_OR_25376). //?
-            put(AnimationID.MINING_MOTHERLODE_DRAGON_OR_TRAILBLAZER, ItemID.DRAGON_PICKAXE_OR_25376).
-            put(AnimationID.MINING_INFERNAL_PICKAXE, ItemID.INFERNAL_PICKAXE).
-            put(AnimationID.MINING_MOTHERLODE_INFERNAL, ItemID.INFERNAL_PICKAXE).
-            put(AnimationID.MINING_CRYSTAL_PICKAXE, ItemID.CRYSTAL_PICKAXE_23863).
-            put(AnimationID.MINING_MOTHERLODE_CRYSTAL, ItemID.CRYSTAL_PICKAXE_23863).
-            build();
-
 
     @Inject
     private CrowdsourcingManager manager;
@@ -117,13 +88,16 @@ public class CrowdsourcingMining
     private Client client;
 
     private SkillingState state = SkillingState.RECOVERING;
+    private int coolDown;
     private int lastExperimentEnd = 0;
     private WorldPoint rockLocation;
     private int rockId;
     private RockType rockType;
     private int startTick;
-    private int pickaxe;
+    private Pickaxe pickaxe;
     private int amulet;
+    private boolean ranToRock;
+    private WorldPoint startPoint;
     private List<Integer> oreTicks = new ArrayList<>();
     private List<Integer> gemTicks = new ArrayList<>();
 
@@ -133,13 +107,23 @@ public class CrowdsourcingMining
         {
             int endTick = client.getTickCount();
             int miningLevel = client.getBoostedSkillLevel(Skill.MINING);
+            int pickaxeId = -1;
+            if (pickaxe == null) {
+                Optional<Pickaxe> pickOp = Pickaxe.getPickaxeFromPlayer(client);
+                if (pickOp.isPresent()) {
+                    pickaxeId = pickOp.get().itemId;
+                }
+            } else {
+                pickaxeId = pickaxe.itemId;
+            }
             MiningData data = new MiningData(
                     miningLevel,
                     startTick,
                     endTick,
                     oreTicks,
                     gemTicks,
-                    pickaxe,
+                    ranToRock,
+                    pickaxeId,
                     amulet,
                     rockId,
                     rockLocation,
@@ -147,9 +131,16 @@ public class CrowdsourcingMining
             );
             manager.storeEvent(data);
 
+            if (!oreTicks.isEmpty() && oreTicks.get(oreTicks.size()-1) == endTick) {
+                coolDown = 0;
+            } else {
+                coolDown = pickaxe == null ? 8 : pickaxe.maxTicks;
+            }
+
             oreTicks = new ArrayList<>();
             gemTicks = new ArrayList<>();
         }
+        pickaxe = null;
         state = SkillingState.RECOVERING;
         lastExperimentEnd = client.getTickCount();
     }
@@ -163,7 +154,11 @@ public class CrowdsourcingMining
         {
             startTick = client.getTickCount();
             state = SkillingState.MINING;
-            amulet = client.getItemContainer(InventoryID.EQUIPMENT).getItem(EquipmentInventorySlot.AMULET.getSlotIdx()).getId();
+            amulet = Optional.ofNullable(client.getItemContainer(InventoryID.EQUIPMENT))
+                    .map(c -> c.getItem(EquipmentInventorySlot.AMULET.getSlotIdx()))
+                    .map(Item::getId)
+                    .orElse(-1);
+            ranToRock = !client.getLocalPlayer().getWorldLocation().equals(startPoint);
         }
         else if (state == SkillingState.MINING && type == ChatMessageType.SPAM && rockType.isSuccessMsg(message))
         {
@@ -173,7 +168,7 @@ public class CrowdsourcingMining
         {
             endExperiment(SkillingEndReason.INVENTORY_FULL);
         }
-        else if (state == SkillingState.MINING && type == ChatMessageType.GAMEMESSAGE && message.startsWith(GEM_MESSAGE))
+        else if (state == SkillingState.MINING && type == ChatMessageType.SPAM && message.startsWith(GEM_MESSAGE))
         {
             gemTicks.add(client.getTickCount());
         }
@@ -185,9 +180,10 @@ public class CrowdsourcingMining
         int animId = client.getLocalPlayer().getAnimation();
         if (state == SkillingState.MINING)
         {
-            if (PICKAXE_ANIMS.containsKey(animId))
+            Optional<Pickaxe> pickOp = Pickaxe.getPickaxeFromAnim(animId);
+            if (pickOp.isPresent())
             {
-                pickaxe = PICKAXE_ANIMS.get(animId);
+                pickaxe = pickOp.get();
             }
             else
             {
@@ -198,13 +194,26 @@ public class CrowdsourcingMining
         {
             endExperiment(SkillingEndReason.INTERRUPTED);
         }
-        else if (state == SkillingState.RECOVERING && client.getTickCount() - lastExperimentEnd >= 3)
+        else if (state == SkillingState.RECOVERING && client.getTickCount() - lastExperimentEnd >= coolDown)
         {
             state = SkillingState.READY;
         }
         else if (state == SkillingState.CLICKED && client.getTickCount() - lastExperimentEnd >= 20)
         {
             state = SkillingState.READY;
+        }
+    }
+
+    @Subscribe
+    public void onWidgetLoaded(WidgetLoaded widgetLoaded) {
+        if (widgetLoaded.getGroupId() == 229) {
+            Widget widget = client.getWidget(widgetLoaded.getGroupId(), 0);
+            if (widget == null) {
+                return;
+            }
+            if (widget.getText().startsWith(INVENTORY_FULL_MESSAGE)) {
+                endExperiment(SkillingEndReason.INVENTORY_FULL);
+            }
         }
     }
 
@@ -220,6 +229,7 @@ public class CrowdsourcingMining
             rockId = id;
             rockType = ORE_OBJECTS.get(id);
             rockLocation = WorldPoint.fromScene(client, menuOptionClicked.getActionParam(), menuOptionClicked.getWidgetId(), client.getPlane());
+            startPoint = client.getLocalPlayer().getWorldLocation();
         }
         else
         {

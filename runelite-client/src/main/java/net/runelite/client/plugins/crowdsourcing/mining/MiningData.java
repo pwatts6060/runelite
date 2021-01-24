@@ -16,6 +16,7 @@ public class MiningData
     private final int endTick;
     private final List<Integer> oreTicks;
     private final List<Integer> gemTicks;
+    private final boolean ranToRock;
     private final int pickaxe;
     private final int amulet;
     private final int rockId;
