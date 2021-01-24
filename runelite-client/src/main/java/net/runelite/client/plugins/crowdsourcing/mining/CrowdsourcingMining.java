@@ -51,6 +51,32 @@ public class CrowdsourcingMining
     private static final Map<Integer, RockType> ORE_OBJECTS = new ImmutableMap.Builder<Integer, RockType>().
             put(ObjectID.ROCKS_11378, RockType.BLURITE).
             put(ObjectID.ROCKS_11379, RockType.BLURITE).
+            put(ObjectID.ROCKS_11161, RockType.COPPER).
+            put(ObjectID.ROCKS_10943, RockType.COPPER).
+            put(ObjectID.ROCKS_11361, RockType.TIN).
+            put(ObjectID.ROCKS_11360, RockType.TIN).
+            put(ObjectID.ROCKS_11366, RockType.COAL).
+            put(ObjectID.ROCKS_11367, RockType.COAL).
+            put(ObjectID.ROCKS_11372, RockType.MITHRIL).
+            put(ObjectID.ROCKS_11373, RockType.MITHRIL).
+            put(ObjectID.ROCKS_11374, RockType.ADAMANT).
+            put(ObjectID.ROCKS_11375, RockType.ADAMANT).
+            put(ObjectID.ROCKS_11362, RockType.CLAY).
+            put(ObjectID.ROCKS_11363, RockType.CLAY).
+            put(ObjectID.ROCKS_11364, RockType.IRON).
+            put(ObjectID.ROCKS_11365, RockType.IRON).
+            put(ObjectID.ROCKS_11368, RockType.SILVER).
+            put(ObjectID.ROCKS_11369, RockType.SILVER).
+            put(ObjectID.ROCKS_11370, RockType.GOLD).
+            put(ObjectID.ROCKS_11371, RockType.GOLD).
+            put(ObjectID.ROCKS_11386, RockType.SANDSTONE).
+            put(ObjectID.ROCKS_11387, RockType.GRANITE).
+            put(ObjectID.ROCKS_11380, RockType.GEMROCK).
+            put(ObjectID.ROCKS_11381, RockType.GEMROCK).
+            put(ObjectID.CRYSTALS, RockType.AMETHYST).
+            put(ObjectID.CRYSTALS_11389, RockType.AMETHYST).
+            put(ObjectID.ROCKS_11377, RockType.RUNITE).
+            put(ObjectID.ROCKS_11376, RockType.RUNITE).
             build();
 
     private static final Map<Integer, Integer> PICKAXE_ANIMS = new ImmutableMap.Builder<Integer, Integer>().
