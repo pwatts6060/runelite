@@ -43,40 +43,43 @@ import net.runelite.client.plugins.crowdsourcing.CrowdsourcingManager;
 import net.runelite.client.plugins.crowdsourcing.skilling.SkillingEndReason;
 import net.runelite.client.plugins.crowdsourcing.skilling.SkillingState;
 
+import static net.runelite.client.plugins.crowdsourcing.mining.RockType.*;
+
 public class CrowdsourcingMining
 {
     private static final String SWING_MESSAGE = "You swing your pick at the rock.";
     private static final String INVENTORY_FULL_MESSAGE = "Your inventory is too full to hold any more logs."; //?
     private static final String GEM_MESSAGE = "You just mined";
     private static final Map<Integer, RockType> ORE_OBJECTS = new ImmutableMap.Builder<Integer, RockType>().
-            put(ObjectID.ROCKS_11378, RockType.BLURITE).
-            put(ObjectID.ROCKS_11379, RockType.BLURITE).
-            put(ObjectID.ROCKS_11161, RockType.COPPER).
-            put(ObjectID.ROCKS_10943, RockType.COPPER).
-            put(ObjectID.ROCKS_11361, RockType.TIN).
-            put(ObjectID.ROCKS_11360, RockType.TIN).
-            put(ObjectID.ROCKS_11366, RockType.COAL).
-            put(ObjectID.ROCKS_11367, RockType.COAL).
-            put(ObjectID.ROCKS_11372, RockType.MITHRIL).
-            put(ObjectID.ROCKS_11373, RockType.MITHRIL).
-            put(ObjectID.ROCKS_11374, RockType.ADAMANT).
-            put(ObjectID.ROCKS_11375, RockType.ADAMANT).
-            put(ObjectID.ROCKS_11362, RockType.CLAY).
-            put(ObjectID.ROCKS_11363, RockType.CLAY).
-            put(ObjectID.ROCKS_11364, RockType.IRON).
-            put(ObjectID.ROCKS_11365, RockType.IRON).
-            put(ObjectID.ROCKS_11368, RockType.SILVER).
-            put(ObjectID.ROCKS_11369, RockType.SILVER).
-            put(ObjectID.ROCKS_11370, RockType.GOLD).
-            put(ObjectID.ROCKS_11371, RockType.GOLD).
-            put(ObjectID.ROCKS_11386, RockType.SANDSTONE).
-            put(ObjectID.ROCKS_11387, RockType.GRANITE).
-            put(ObjectID.ROCKS_11380, RockType.GEMROCK).
-            put(ObjectID.ROCKS_11381, RockType.GEMROCK).
-            put(ObjectID.CRYSTALS, RockType.AMETHYST).
-            put(ObjectID.CRYSTALS_11389, RockType.AMETHYST).
-            put(ObjectID.ROCKS_11377, RockType.RUNITE).
-            put(ObjectID.ROCKS_11376, RockType.RUNITE).
+            put(ObjectID.ROCKS_11378, BLURITE).
+            put(ObjectID.ROCKS_11379, BLURITE).
+            put(ObjectID.ROCKS_11161, COPPER).
+            put(ObjectID.ROCKS_10943, COPPER).
+            put(ObjectID.ROCKS_11361, TIN).
+            put(ObjectID.ROCKS_11360, TIN).
+            put(ObjectID.ROCKS_11366, COAL).
+            put(ObjectID.ROCKS_11367, COAL).
+            put(ObjectID.ROCKS_11372, MITHRIL).
+            put(ObjectID.ROCKS_11373, MITHRIL).
+            put(ObjectID.ROCKS_11374, ADAMANT).
+            put(ObjectID.ROCKS_11375, ADAMANT).
+            put(ObjectID.ROCKS_11362, CLAY).
+            put(ObjectID.ROCKS_11363, CLAY).
+            put(ObjectID.ROCKS_11364, IRON).
+            put(ObjectID.ROCKS_11365, IRON).
+            put(ObjectID.ROCKS_11368, SILVER).
+            put(ObjectID.ROCKS_11369, SILVER).
+            put(ObjectID.ROCKS_11370, GOLD).
+            put(ObjectID.ROCKS_11371, GOLD).
+            put(ObjectID.ROCKS_11386, SANDSTONE).
+            put(ObjectID.ROCKS_11387, GRANITE).
+            put(ObjectID.ROCKS_11380, GEMROCK).
+            put(ObjectID.ROCKS_11381, GEMROCK).
+            put(ObjectID.PILE_OF_ROCK, LIMESTONE).
+            put(ObjectID.CRYSTALS, AMETHYST).
+            put(ObjectID.CRYSTALS_11389, AMETHYST).
+            put(ObjectID.ROCKS_11377, RUNITE).
+            put(ObjectID.ROCKS_11376, RUNITE).
             build();
 
     private static final Map<Integer, Integer> PICKAXE_ANIMS = new ImmutableMap.Builder<Integer, Integer>().

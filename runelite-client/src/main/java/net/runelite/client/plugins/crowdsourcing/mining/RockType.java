@@ -21,7 +21,7 @@ public enum RockType {
             return message.startsWith("You just mined");
         }
     },
-    ;
+    LIMESTONE("You manage to mine some limestone.");
 
     final String successMessage;
 
