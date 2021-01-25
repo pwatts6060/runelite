@@ -76,7 +76,9 @@ public enum Pickaxe
 		for (Pickaxe pickaxe : values)
 		{
 			if (ArrayUtils.contains(pickaxe.animIds, animId))
+			{
 				return Optional.of(pickaxe);
+			}
 		}
 		return Optional.empty();
 	}
@@ -89,7 +91,9 @@ public enum Pickaxe
 		for (Pickaxe pickaxe : values)
 		{
 			if (weapon.getId() == pickaxe.itemId || client.getItemContainer(InventoryID.INVENTORY).contains(pickaxe.itemId))
+			{
 				return Optional.of(pickaxe);
+			}
 		}
 		return Optional.empty();
 	}

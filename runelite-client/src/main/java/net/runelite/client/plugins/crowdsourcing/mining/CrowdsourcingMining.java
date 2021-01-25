@@ -111,7 +111,8 @@ public class CrowdsourcingMining
 				{
 					pickaxeId = pickOp.get().itemId;
 				}
-			} else
+			}
+			else
 			{
 				pickaxeId = pickaxe.itemId;
 			}
@@ -133,7 +134,8 @@ public class CrowdsourcingMining
 			if (!oreTicks.isEmpty() && oreTicks.get(oreTicks.size() - 1) == endTick)
 			{
 				coolDown = 0;
-			} else
+			}
+			else
 			{
 				coolDown = pickaxe == null ? 8 : pickaxe.maxTicks;
 			}
@@ -160,13 +162,16 @@ public class CrowdsourcingMining
 					.map(Item::getId)
 					.orElse(-1);
 			ranToRock = !client.getLocalPlayer().getWorldLocation().equals(startPoint);
-		} else if (state == SkillingState.MINING && type == ChatMessageType.SPAM && rockType.isSuccessMsg(message))
+		}
+		else if (state == SkillingState.MINING && type == ChatMessageType.SPAM && rockType.isSuccessMsg(message))
 		{
 			oreTicks.add(client.getTickCount());
-		} else if (state == SkillingState.MINING && type == ChatMessageType.GAMEMESSAGE && message.equals(INVENTORY_FULL_MESSAGE))
+		}
+		else if (state == SkillingState.MINING && type == ChatMessageType.GAMEMESSAGE && message.equals(INVENTORY_FULL_MESSAGE))
 		{
 			endExperiment(SkillingEndReason.INVENTORY_FULL);
-		} else if (state == SkillingState.MINING && type == ChatMessageType.SPAM && message.startsWith(GEM_MESSAGE))
+		}
+		else if (state == SkillingState.MINING && type == ChatMessageType.SPAM && message.startsWith(GEM_MESSAGE))
 		{
 			gemTicks.add(client.getTickCount());
 		}
@@ -182,17 +187,21 @@ public class CrowdsourcingMining
 			if (pickOp.isPresent())
 			{
 				pickaxe = pickOp.get();
-			} else
+			}
+			else
 			{
 				endExperiment(SkillingEndReason.INTERRUPTED);
 			}
-		} else if (animId != -1)
+		}
+		else if (animId != -1)
 		{
 			endExperiment(SkillingEndReason.INTERRUPTED);
-		} else if (state == SkillingState.RECOVERING && client.getTickCount() - lastExperimentEnd >= coolDown)
+		}
+		else if (state == SkillingState.RECOVERING && client.getTickCount() - lastExperimentEnd >= coolDown)
 		{
 			state = SkillingState.READY;
-		} else if (state == SkillingState.CLICKED && client.getTickCount() - lastExperimentEnd >= 20)
+		}
+		else if (state == SkillingState.CLICKED && client.getTickCount() - lastExperimentEnd >= 20)
 		{
 			state = SkillingState.READY;
 		}
@@ -228,7 +237,8 @@ public class CrowdsourcingMining
 			rockType = ORE_OBJECTS.get(id);
 			rockLocation = WorldPoint.fromScene(client, menuOptionClicked.getActionParam(), menuOptionClicked.getWidgetId(), client.getPlane());
 			startPoint = client.getLocalPlayer().getWorldLocation();
-		} else
+		}
+		else
 		{
 			endExperiment(SkillingEndReason.INTERRUPTED);
 		}
