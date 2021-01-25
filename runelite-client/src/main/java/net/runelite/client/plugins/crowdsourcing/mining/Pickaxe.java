@@ -26,8 +26,6 @@ package net.runelite.client.plugins.crowdsourcing.mining;
 
 import net.runelite.api.*;
 import org.apache.commons.lang3.ArrayUtils;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Optional;
 
 public enum Pickaxe
@@ -85,17 +83,21 @@ public enum Pickaxe
 
 	static Optional<Pickaxe> getPickaxeFromPlayer(Client client)
 	{
-		List<Item> items = new LinkedList<>();
-		Item weapon = client.getItemContainer(InventoryID.EQUIPMENT).getItem(EquipmentInventorySlot.WEAPON.getSlotIdx());
-		Item[] inv = client.getItemContainer(InventoryID.INVENTORY).getItems();
+		int weapon = Optional.ofNullable(client.getItemContainer(InventoryID.EQUIPMENT))
+				.map(c -> c.getItem(EquipmentInventorySlot.WEAPON.getSlotIdx()))
+				.map(Item::getId)
+				.orElse(-1);
 		for (Pickaxe pickaxe : values)
 		{
-			if (weapon.getId() == pickaxe.itemId || client.getItemContainer(InventoryID.INVENTORY).contains(pickaxe.itemId))
+			if (!pickaxe.meetsReqs(client))
+			{
+				continue;
+			}
+			if (weapon == pickaxe.itemId || client.getItemContainer(InventoryID.INVENTORY).contains(pickaxe.itemId))
 			{
 				return Optional.of(pickaxe);
 			}
 		}
 		return Optional.empty();
 	}
-
 }
