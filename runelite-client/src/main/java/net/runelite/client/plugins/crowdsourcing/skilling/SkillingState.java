@@ -30,6 +30,6 @@ public enum SkillingState
 	READY,
 	CLICKED,
 	CUTTING,
-    MINING,
+	MINING,
 	RECOVERING
 }
