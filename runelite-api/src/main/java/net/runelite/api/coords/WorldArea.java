@@ -103,7 +103,7 @@ public class WorldArea
 	public boolean contains2D(WorldPoint worldPoint)
 	{
 		return worldPoint.getX() >= x && worldPoint.getX() <= x + width
-				&& worldPoint.getY() >= y && worldPoint.getY() <= y + height;
+			&& worldPoint.getY() >= y && worldPoint.getY() <= y + height;
 	}
 
 	/**
