@@ -89,11 +89,21 @@ public class WorldArea
 	}
 
 	/**
-	 * @return true if the WorldPoint is contained within the bounds of this area.
+	 * @return true if the WorldPoint is contained within the bounds of this area its plane, false otherwise.
 	 */
 	public boolean contains(WorldPoint worldPoint)
 	{
-		return plane == worldPoint.getPlane() && worldPoint.getX() >= x && worldPoint.getX() <= x + width && worldPoint.getY() >= y && worldPoint.getY() <= y + height;
+		return plane == worldPoint.getPlane()
+			&& contains2D(worldPoint);
+	}
+
+	/**
+	 * @return true if the WorldPoint is contained within the bounds of this area regardless of plane, false otherwise.
+	 */
+	public boolean contains2D(WorldPoint worldPoint)
+	{
+		return worldPoint.getX() >= x && worldPoint.getX() <= x + width
+				&& worldPoint.getY() >= y && worldPoint.getY() <= y + height;
 	}
 
 	/**

@@ -375,21 +375,28 @@ public class WorldPoint
 	}
 
 	/**
-	 * @return true if the WorldArea contains this point, false otherwise
-	 */
-	public boolean inArea(WorldArea worldArea)
-	{
-		return worldArea.contains(this);
-	}
-
-	/**
-	 * @return true if at least one WorldArea contains this point, false otherwise
+	 * @return true if at least one WorldArea contains this point, false otherwise.
 	 */
 	public boolean inArea(WorldArea... worldAreas)
 	{
 		for (WorldArea area : worldAreas)
 		{
 			if (area.contains(this))
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * @return true if at least one WorldArea contains this point, false otherwise.
+	 */
+	public boolean inArea2D(WorldArea... worldAreas)
+	{
+		for (WorldArea area : worldAreas)
+		{
+			if (area.contains2D(this))
 			{
 				return true;
 			}
